@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/w1ll-dev/node-api-tdd/issues"
   },
-  "homepage": "https://github.com/w1ll-dev/node-api-tdd#readme"
+  "homepage": "https://github.com/w1ll-dev/node-api-tdd#readme",
+  "devDependencies": {
+    "standard": "^14.3.4"
+  }
 }
