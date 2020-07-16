@@ -1,5 +1,6 @@
 const LoginRouter = require('../routers/login-router')
 const MissingParamError = require('../helpers/missing-param-error')
+const UnauthorizedError = require('../helpers/unauthorized-error')
 
 // sut === system under test (component tested)
 const makeSut = () => {
@@ -25,7 +26,7 @@ describe('Login Router', () => {
       }
     }
     const httpResponse = sut.route(httpRequest)
-    expect(httpResponse.status).toBe(400)
+    expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(new MissingParamError('email'))
   })
 
@@ -38,7 +39,7 @@ describe('Login Router', () => {
       }
     }
     const httpResponse = sut.route(httpRequest)
-    expect(httpResponse.status).toBe(400)
+    expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(new MissingParamError('password'))
   })
 
@@ -46,7 +47,7 @@ describe('Login Router', () => {
     // sut === system under test
     const { sut } = makeSut()
     const httpResponse = sut.route()
-    expect(httpResponse.status).toBe(500)
+    expect(httpResponse.statusCode).toBe(500)
   })
 
   test('Should return 500 if no httpRequest has no body', () => {
@@ -54,7 +55,7 @@ describe('Login Router', () => {
     const { sut } = makeSut()
     const httpRequest = {}
     const httpResponse = sut.route(httpRequest)
-    expect(httpResponse.status).toBe(500)
+    expect(httpResponse.statusCode).toBe(500)
   })
 
   test('Should call authUseCase with correct params', () => {
@@ -80,5 +81,6 @@ describe('Login Router', () => {
     }
     const httpResponse = sut.route(httpRequest)
     expect(httpResponse.statusCode).toBe(401)
+    expect(httpResponse.body).toEqual(new UnauthorizedError())
   })
 })
