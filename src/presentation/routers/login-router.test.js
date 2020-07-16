@@ -4,17 +4,19 @@ const UnauthorizedError = require('../helpers/unauthorized-error')
 
 // sut === system under test (component tested)
 const makeSut = () => {
-  class AuthUseCase {
+  class AuthUseCaseSpy {
     auth (email, password) {
       this.email = email
       this.password = password
+      return this.accessToken
     }
   }
-  const authUseCase = new AuthUseCase()
-  const sut = new LoginRouter(authUseCase)
+  const authUseCaseSpy = new AuthUseCaseSpy()
+  authUseCaseSpy.accessToken = 'valid_token'
+  const sut = new LoginRouter(authUseCaseSpy)
   return {
     sut,
-    authUseCase
+    authUseCaseSpy
   }
 }
 describe('Login Router', () => {
@@ -58,8 +60,8 @@ describe('Login Router', () => {
     expect(httpResponse.statusCode).toBe(500)
   })
 
-  test('Should call authUseCase with correct params', () => {
-    const { sut, authUseCase } = makeSut()
+  test('Should call authUseCaseSpy with correct params', () => {
+    const { sut, authUseCaseSpy } = makeSut()
     const httpRequest = {
       body: {
         email: 'any_email@mail.com',
@@ -67,12 +69,13 @@ describe('Login Router', () => {
       }
     }
     sut.route(httpRequest)
-    expect(authUseCase.email).toBe(httpRequest.body.email)
-    expect(authUseCase.password).toBe(httpRequest.body.password)
+    expect(authUseCaseSpy.email).toBe(httpRequest.body.email)
+    expect(authUseCaseSpy.password).toBe(httpRequest.body.password)
   })
 
   test('Should return 401 when invalid credentials are provided', () => {
-    const { sut } = makeSut()
+    const { sut, authUseCaseSpy } = makeSut()
+    authUseCaseSpy.accessToken = null
     const httpRequest = {
       body: {
         email: 'invalid_email@mail.com',
@@ -84,7 +87,19 @@ describe('Login Router', () => {
     expect(httpResponse.body).toEqual(new UnauthorizedError())
   })
 
-  test('Should return 500 if no authUseCase is provided', () => {
+  test('Should return 200 when valid credentials are provided', () => {
+    const { sut } = makeSut()
+    const httpRequest = {
+      body: {
+        email: 'valid_email@mail.com',
+        password: 'valid_password'
+      }
+    }
+    const httpResponse = sut.route(httpRequest)
+    expect(httpResponse.statusCode).toBe(200)
+  })
+
+  test('Should return 500 if no authUseCaseSpy is provided', () => {
     const sut = new LoginRouter()
     const httpRequest = {
       body: {
@@ -96,9 +111,9 @@ describe('Login Router', () => {
     expect(httpResponse.statusCode).toBe(500)
   })
 
-  test('Should return 500 if authUseCase has no auth method', () => {
-    const authUseCase = class AuthUseCase {}
-    const sut = new LoginRouter(authUseCase)
+  test('Should return 500 if authUseCaseSpy has no auth method', () => {
+    const authUseCaseSpy = class AuthUseCaseSpy {}
+    const sut = new LoginRouter(authUseCaseSpy)
     const httpRequest = {
       body: {
         email: 'any_email@mail.com',
