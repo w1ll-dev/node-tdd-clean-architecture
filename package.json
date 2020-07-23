@@ -45,6 +45,7 @@
     "standard": "^14.3.4"
   },
   "dependencies": {
-    "lint-staged": "^10.2.11"
+    "lint-staged": "^10.2.11",
+    "validator": "^13.1.1"
   }
 }
