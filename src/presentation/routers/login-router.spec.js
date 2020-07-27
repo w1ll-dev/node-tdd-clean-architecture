@@ -6,8 +6,6 @@ const {
   UnauthorizedError
 } = require('../errors')
 
-// sut === system under test (component tested)
-
 const makeAuthUseCase = () => {
   class AuthUseCaseSpy {
     auth (email, password) {
