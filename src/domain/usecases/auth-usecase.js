@@ -21,14 +21,11 @@ module.exports = class AuthUseCase {
       throw new InvalidParamError('loadUserByEmailRepository')
     }
     const user = await this.loadUserByEmailRepository.load(email)
-    if (!user) {
-      return null
+    const isValid = user && await this.encrypter.compare(password, user.password)
+    if (isValid) {
+      const acecessToken = await this.tokenGenerator.generate(user.id)
+      return acecessToken
     }
-    const isValid = await this.encrypter.compare(password, user.password)
-    if (!isValid) {
-      return null
-    }
-    const acecessToken = await this.tokenGenerator.generate(user.id)
-    return acecessToken
+    return null
   }
 }
