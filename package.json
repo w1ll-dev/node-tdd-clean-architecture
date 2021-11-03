@@ -46,6 +46,6 @@
   },
   "dependencies": {
     "lint-staged": "^10.2.11",
-    "validator": "^13.1.1"
+    "validator": "^13.7.0"
   }
 }
